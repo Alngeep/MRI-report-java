@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MRI Structured Reporting – Dr. Abdulrahman Alnaqeeb</title>
+<style>
+*{box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+body{margin:0;background:#f0f4f8;color:#1e293b}
+header{background:#0f2942;color:#fff;padding:16px 24px;border-bottom:4px solid #0ea5e9}
+header h1{margin:0;font-size:20px}
+header p{margin:4px 0 0;font-size:13px;color:#bae6fd}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;background:#1e3a5f;padding:10px 24px}
+.tab-btn{background:#2d4e7a;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:600;font-size:14px}
+.tab-btn.active{background:#0ea5e9}
+.macros{background:#e0f2fe;padding:10px 24px;border-bottom:1px solid #bae6fd;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.macros span{font-weight:700;font-size:13px;color:#0369a1}
+.macro-btn{background:#0284c7;color:#fff;border:none;padding:7px 12px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600}
+.macro-btn:hover{background:#0369a1}
+.container{display:flex;flex-wrap:wrap;gap:20px;padding:20px 24px;max-width:1400px;margin:auto}
+.left{flex:1 1 520px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.right{flex:1 1 440px;background:#fff;border-radius:10px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.08);display:flex;flex-direction:column;min-width:0}
+.card{background:#fff;border-radius:8px;padding:14px 16px;box-shadow:0 1px 5px rgba(0,0,0,.06);border-left:5px solid #22c55e}
+.card.abnormal{border-left-color:#ef4444}
+.card.info{border-left-color:#0ea5e9}
+.card-header{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.card-title{font-weight:700;font-size:15px;color:#0f2942}
+.toggle-group{display:flex;gap:6px}
+.tgl{padding:6px 12px;border:1px solid #cbd5e1;border-radius:5px;cursor:pointer;font-size:12px;font-weight:700;background:#f8fafc;color:#475569}
+.tgl.norm.active{background:#16a34a;color:#fff;border-color:#16a34a}
+.tgl.abn.active{background:#dc2626;color:#fff;border-color:#dc2626}
+.abn-box{margin-top:10px;padding-top:10px;border-top:1px dashed #cbd5e1;display:none}
+.card.abnormal .abn-box{display:block}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.chip{background:#fef2f2;color:#991b1b;border:1px solid #fecaca;padding:6px 10px;border-radius:5px;font-size:12px;cursor:pointer;text-align:left}
+.chip:hover{background:#fee2e2}
+label{display:block;font-size:12px;font-weight:700;color:#475569;margin:8px 0 4px}
+.inp,textarea.inp{width:100%;padding:8px 10px;border:1px solid #cbd5e1;border-radius:5px;font-size:13px}
+textarea.inp{min-height:64px;resize:vertical}
+.disc{background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;padding:10px;margin-bottom:8px}
+.disc b{font-size:12px;color:#0f2942}
+.disc-row{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.disc select{padding:6px;border-radius:4px;border:1px solid #94a3b8;font-size:12px;background:#fff;max-width:100%}
+.add-btn{background:#0f2942;color:#fff;border:none;padding:7px 12px;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer}
+.add-btn:hover{background:#1e3a5f}
+.rh{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px}
+.rh h2{margin:0;font-size:17px;color:#0f2942}
+.copy-btn{background:#16a34a;color:#fff;border:none;padding:9px 16px;border-radius:6px;font-weight:700;cursor:pointer;font-size:13px}
+.copy-btn:hover{background:#15803d}
+#out{width:100%;flex:1;min-height:480px;border:1px solid #cbd5e1;border-radius:6px;padding:14px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;resize:vertical;background:#fcfdfe}
+.note{font-size:11px;color:#64748b;margin-top:8px}
+@media(max-width:600px){.container{padding:12px}header,.tabs,.macros{padding-left:12px;padding-right:12px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>SYSTEMATIC MRI STRUCTURED REPORTING</h1>
+  <p>Dr. Abdulrahman Alnaqeeb | Radiologist – Arab Board &amp; Jordanian Board of Radiology</p>
+</header>
+<div class="tabs" id="tabs"></div>
+<div class="macros" id="macros"></div>
+<div class="container">
+  <div class="left" id="zones"></div>
+  <div class="right">
+    <div class="rh"><h2>Generated Radiology Report</h2><button class="copy-btn" id="copyBtn">Copy Report</button></div>
+    <textarea id="out"></textarea>
+    <div class="note">Do not enter patient names or identifying data. Edits made directly in this box are replaced when you change a finding above.</div>
+  </div>
+</div>
+
+<script>
+var DATA = {
+  lumbar: {
+    tabName: "Lumbar Spine",
+    title: "MRI LUMBAR SPINE (WITHOUT CONTRAST)",
+    tech: "Multiplanar, multisequence MRI of the lumbar spine was performed without intravenous contrast.",
+    normalImpression: "Unremarkable MRI of the lumbar spine. No significant disc herniation, spinal canal stenosis, or nerve root compression.",
+    levels: ["L1-L2","L2-L3","L3-L4","L4-L5","L5-S1"],
+    macros: [
+      {name:"All Normal", fn:function(){}},
+      {name:"Classic L4-L5 / L5-S1 Degenerative", fn:function(){
+        setAbn(0,"Straightening of the normal lumbar lordosis, likely related to paraspinal muscle spasm.");
+        setAbn(3,"Multilevel disc desiccation with mild loss of disc height at L4-L5 and L5-S1.\nL4-L5: Diffuse disc bulge causing mild central spinal canal stenosis and mild bilateral neural foraminal narrowing.\nL5-S1: Left paracentral disc extrusion impinging upon the descending left S1 nerve root in the lateral recess.");
+        setAbn(5,"Mild bilateral lower lumbar (L4-L5 and L5-S1) facet joint osteoarthritis with mild ligamentum flavum hypertrophy.");
+      }},
+      {name:"Severe Facet OA + Synovial Cyst", fn:function(){
+        setAbn(5,"Severe bilateral L4-L5 facet joint osteoarthritis with articular cartilage loss, subchondral sclerosis, and joint effusion. Associated left-sided juxta-articular synovial cyst (measuring approximately 8 mm) protruding into the left lateral recess, causing severe left lateral recess stenosis and compression of the descending left L5 nerve root.");
+      }}
+    ],
+    zones: [
+      {name:"1. Alignment & Curvature", label:"Alignment & Curvature",
+       norm:"Normal lumbar lordosis and vertebral alignment are preserved without spondylolisthesis.",
+       chips:["Straightening of the normal lumbar lordosis, likely secondary to paraspinal muscle spasm.",
+              "Grade I anterolisthesis of L4 over L5 (degenerative) with mild facet remodeling.",
+              "Grade I anterolisthesis of L5 over S1 secondary to bilateral L5 pars interarticularis defects (spondylolysis).",
+              "Mild lumbar dextroscoliosis.","Mild lumbar levoscoliosis."]},
+      {name:"2. Vertebral Bodies & Bone Marrow", label:"Vertebral Bodies & Bone Marrow",
+       norm:"Normal vertebral body heights and bone marrow signal intensity without compression fracture or focal marrow-replacing lesion.",
+       chips:["Modic Type I endplate marrow changes (edema) at L4-L5 / L5-S1.",
+              "Modic Type II endplate fatty marrow changes at L4-L5 / L5-S1.",
+              "Benign intraosseous hemangioma noted within the L3 vertebral body.",
+              "Multilevel anterior marginal osteophytes consistent with spondylosis deformans.",
+              "Acute/subacute superior endplate compression fracture of L1 with bone marrow edema on STIR."]},
+      {name:"3. Conus Medullaris & Cauda Equina", label:"Conus Medullaris & Cauda Equina",
+       norm:"The conus medullaris terminates normally at the L1 level and demonstrates normal signal intensity. The cauda equina nerve roots are unremarkable.",
+       chips:["Redundant/serpentine cauda equina nerve roots proximal to the level of severe spinal canal stenosis.",
+              "Clumping of the cauda equina nerve roots suggestive of arachnoiditis.",
+              "Small Tarlov (perineural) cysts noted within the sacral spinal canal without mass effect."]},
+      {name:"4. Intervertebral Discs & Spinal Canal", label:"Intervertebral Discs & Spinal Canal", disc:true,
+       norm:"Intervertebral disc heights and hydration are preserved. No significant disc bulge, protrusion, extrusion, or central spinal canal stenosis.",
+       chips:["Multilevel intervertebral disc desiccation with mild loss of disc height.",
+              "Posterior annular fissure (high-intensity zone) at L4-L5 without significant canal stenosis.",
+              "Sequestered disc fragment migrated inferiorly behind the L5 vertebral body."]},
+      {name:"5. Neural Foramina & Exiting Nerve Roots", label:"Neural Foramina & Exiting Nerve Roots",
+       norm:"The neural foramina are patent bilaterally throughout the lumbar spine with normal exiting nerve roots.",
+       chips:["Mild bilateral neural foraminal narrowing at L4-L5 without exiting nerve root compression.",
+              "Moderate-to-severe left L4-L5 neural foraminal stenosis abutting/compressing the exiting left L4 nerve root.",
+              "Moderate-to-severe right L5-S1 neural foraminal stenosis compressing the exiting right L5 nerve root."]},
+      {name:"6. Facet Joints & Ligamentum Flavum", label:"Facet Joints & Posterior Elements",
+       norm:"The facet joints, posterior elements, and ligamenta flava are unremarkable.",
+       chips:["Mild-to-moderate bilateral lower lumbar facet joint arthropathy and ligamentum flavum hypertrophy.",
+              "Bilateral L4-L5 facet joint effusions with mild ligamentum flavum hypertrophy.",
+              "Left-sided juxta-articular synovial cyst at L4-L5 protruding into the left lateral recess."]},
+      {name:"7. Paraspinal Soft Tissues & Incidental", label:"Paraspinal Soft Tissues",
+       norm:"The visualized paraspinal soft tissues are unremarkable.",
+       chips:["Fatty atrophy of the lumbar paraspinal (multifidus) muscles.",
+              "Simple cyst within the visualized kidney, incidental.",
+              "Mild subcutaneous edema in the lower lumbar region."]}
+    ]
+  }
+};
+
+var cur = "lumbar", S = {};
+function $(id){return document.getElementById(id);}
+function esc(t){return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+function resetStudy(){
+  var d = DATA[cur];
+  S[cur] = {hist:"", tech:d.tech, imp:"", zones:d.zones.map(function(){return {abn:false,text:""};})};
+}
+function setAbn(i, text){ S[cur].zones[i] = {abn:true, text:text}; }
+
+function renderTabs(){
+  var h = "";
+  for (var k in DATA){ h += '<button class="tab-btn'+(k===cur?' active':'')+'" data-k="'+k+'">'+DATA[k].tabName+'</button>'; }
+  $("tabs").innerHTML = h;
+}
+function renderMacros(){
+  var h = "<span>Quick macros:</span>";
+  DATA[cur].macros.forEach(function(m,i){ h += '<button class="macro-btn" data-m="'+i+'">'+m.name+'</button>'; });
+  $("macros").innerHTML = h;
+}
+function sel(id, opts){
+  return '<select id="'+id+'">'+opts.map(function(o){return '<option value="'+esc(o[0])+'">'+esc(o[1])+'</option>';}).join("")+'</select>';
+}
+function discBuilder(d){
+  return '<div class="disc"><b>Disc builder (adds one line to the findings)</b><div class="disc-row">'
+    + sel("d_lv", d.levels.map(function(l){return [l,l];}))
+    + sel("d_ty", [["Diffuse disc bulge","Bulge"],["Disc protrusion","Protrusion"],["Disc extrusion","Extrusion"],["Posterior annular fissure","Annular fissure"]])
+    + sel("d_pos", [["central","Central"],["left paracentral","Left paracentral"],["right paracentral","Right paracentral"],["left foraminal","Left foraminal"],["right foraminal","Right foraminal"],["bilateral foraminal","Bilateral foraminal"]])
+    + sel("d_cn", [["","No canal stenosis"],["mild","Mild canal stenosis"],["moderate","Moderate canal stenosis"],["severe","Severe canal stenosis"]])
+    + sel("d_nr", [["","No nerve root contact"],["abutting the traversing nerve root","Abutting nerve root"],["compressing the traversing nerve root","Compressing nerve root"]])
+    + '</div><button class="add-btn" data-act="disc">Add line</button></div>';
+}
+function renderZones(){
+  var d = DATA[cur], s = S[cur];
+  var h = '<div class="card info"><div class="card-title">Clinical history &amp; technique</div>'
+    + '<label>Clinical history</label><input class="inp" id="hist" value="'+esc(s.hist)+'" placeholder="e.g. Low back pain radiating to the left leg">'
+    + '<label>Technique</label><textarea class="inp" id="tech">'+esc(s.tech)+'</textarea></div>';
+  d.zones.forEach(function(zn,i){
+    var z = s.zones[i];
+    h += '<div class="card'+(z.abn?' abnormal':'')+'"><div class="card-header"><div class="card-title">'+esc(zn.name)+'</div>'
+      + '<div class="toggle-group"><button class="tgl norm'+(z.abn?'':' active')+'" data-z="'+i+'" data-v="0">Normal</button>'
+      + '<button class="tgl abn'+(z.abn?' active':'')+'" data-z="'+i+'" data-v="1">Abnormal</button></div></div>'
+      + '<div class="abn-box">'
+      + (zn.disc ? discBuilder(d) : '')
+      + '<div class="chips">'+zn.chips.map(function(c,ci){return '<button class="chip" data-z="'+i+'" data-c="'+ci+'">'+esc(c)+'</button>';}).join("")+'</div>'
+      + '<textarea class="inp" data-t="'+i+'" placeholder="Describe the abnormality or tap a finding above">'+esc(z.text)+'</textarea></div></div>';
+  });
+  h += '<div class="card info"><div class="card-header"><div class="card-title">Impression</div><button class="add-btn" data-act="imp">Auto-fill from findings</button></div>'
+    + '<textarea class="inp" id="imp" placeholder="Leave empty to generate automatically">'+esc(s.imp)+'</textarea></div>';
+  $("zones").innerHTML = h;
+}
+
+function firstLines(){
+  var out = [];
+  DATA[cur].zones.forEach(function(zn,i){
+    var z = S[cur].zones[i];
+    if (z.abn && z.text.trim()){
+      z.text.split("\n").forEach(function(l){ l = l.replace(/^[-•\s]+/,"").trim(); if (l && !/^Multilevel intervertebral disc desiccation/.test(l)) out.push(l); });
+    }
+  });
+  return out;
+}
+function autoImp(){
+  var l = firstLines();
+  if (!l.length) return DATA[cur].normalImpression;
+  return l.map(function(t,i){return (i+1)+". "+t;}).join("\n");
+}
+function build(){
+  var d = DATA[cur], s = S[cur], r = d.title + "\n\n";
+  if (s.hist.trim()) r += "CLINICAL HISTORY:\n" + s.hist.trim() + "\n\n";
+  if (s.tech.trim()) r += "TECHNIQUE:\n" + s.tech.trim() + "\n\n";
+  r += "FINDINGS:\n";
+  d.zones.forEach(function(zn,i){
+    var z = s.zones[i];
+    var t = z.abn ? (z.text.trim() || "[Abnormality to be described]") : zn.norm;
+    r += zn.label + ":\n" + t + "\n\n";
+  });
+  r += "IMPRESSION:\n" + (s.imp.trim() || autoImp()) + "\n\n";
+  r += "Dr. Abdulrahman Alnaqeeb\nSpecialized Radiologist (JBR & ABR)";
+  return r;
+}
+function updateReport(){ $("out").value = build(); }
+function renderAll(){ renderTabs(); renderMacros(); renderZones(); updateReport(); }
+
+document.addEventListener("click", function(e){
+  var t = e.target;
+  if (t.dataset.k){ cur = t.dataset.k; if (!S[cur]) resetStudy(); renderAll(); return; }
+  if (t.dataset.m !== undefined){ resetStudy(); DATA[cur].macros[+t.dataset.m].fn(); renderAll(); return; }
+  if (t.dataset.v !== undefined){
+    var z = S[cur].zones[+t.dataset.z]; z.abn = t.dataset.v === "1";
+    renderZones(); updateReport(); return;
+  }
+  if (t.dataset.c !== undefined){
+    var zi = +t.dataset.z, zz = S[cur].zones[zi];
+    zz.abn = true; zz.text = (zz.text ? zz.text + "\n" : "") + DATA[cur].zones[zi].chips[+t.dataset.c];
+    renderZones(); updateReport(); return;
+  }
+  if (t.dataset.act === "disc"){
+    var di = DATA[cur].zones.findIndex(function(x){return x.disc;}), dz = S[cur].zones[di];
+    var line = $("d_lv").value + ": " + $("d_ty").value + " (" + $("d_pos").value + ")"
+      + ($("d_cn").value ? ", causing " + $("d_cn").value + " central canal stenosis" : "")
+      + ($("d_nr").value ? ", " + $("d_nr").value : "") + ".";
+    dz.abn = true; dz.text = (dz.text ? dz.text + "\n" : "") + line;
+    renderZones(); updateReport(); return;
+  }
+  if (t.dataset.act === "imp"){ S[cur].imp = autoImp(); renderZones(); updateReport(); return; }
+  if (t.id === "copyBtn"){ copyReport(); }
+});
+document.addEventListener("input", function(e){
+  var t = e.target;
+  if (t.dataset.t !== undefined){ S[cur].zones[+t.dataset.t].text = t.value; }
+  else if (t.id === "hist"){ S[cur].hist = t.value; }
+  else if (t.id === "tech"){ S[cur].tech = t.value; }
+  else if (t.id === "imp"){ S[cur].imp = t.value; }
+  else return;
+  updateReport();
+});
+
+function copyReport(){
+  var ta = $("out"), b = $("copyBtn");
+  function done(){ b.textContent = "Copied"; setTimeout(function(){ b.textContent = "Copy Report"; }, 1500); }
+  if (navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(ta.value).then(done, function(){ ta.select(); document.execCommand("copy"); done(); });
+  } else { ta.select(); document.execCommand("copy"); done(); }
+}
+
+resetStudy();
+renderAll();
+</script>
+</body>
+</html>
